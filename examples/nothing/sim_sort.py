@@ -13,7 +13,7 @@ sigmaPars = {0:0.5}
 eMax       = 4096
 nBins      = 4096
 
-def readInputFile(fileName = "co60_sim_sort.inp"):
+def readInputFile(fileName = "sim_sort.inp"):
 
     try:
         inFile = open(fileName, 'r')
@@ -51,9 +51,6 @@ def Sort(fileName, nDet=1):
     
     # Sort the output file.
     photopeakCounts = 0
-    lastEvent  = -1
-    lastDet    = -1
-    lastEnergy = 0
     for line in inFile.readlines():
         words = line.split()
         event = int(words[0])
@@ -70,21 +67,7 @@ def Sort(fileName, nDet=1):
 
         histosRaw[det].Fill(eSim)
         histos[det].Fill(eRes)
-
-        # Symmetrized gamma-gamma matrix
-        if event == lastEvent and det != lastDet:
-            gam_gam.Fill(eRes, lastEnergy)
-            gam_gam.Fill(lastEnergy, eRes)
-
-            # 1332 keV cut
-            if eRes > 1260 and eRes < 1400:
-                cut_1332.Fill(lastEnergy)
-            if lastEnergy > 1260 and lastEnergy < 1400:
-                cut_1332.Fill(eRes)
-        
-        lastEvent = event
-        lastDet = det
-        lastEnergy = eRes
+        histoAll.Fill(eRes)
         
     print('{0:d} photopeak counts'.format(photopeakCounts))
 
@@ -96,20 +79,15 @@ nDet, sigmaPars, eMax, nBins = readInputFile()
 histos = []
 histosRaw = []
 for i in range(nDet):
-    hRaw = root.TH1F(f"enRaw{i}", f"Detector {i} energy",
+    hRaw = root.TH1D(f"enRaw{i}", f"Detector {i} energy",
                      nBins, 0, eMax)
     histosRaw.append(hRaw)
-    h    = root.TH1F(f"en{i}", f"Detector {i} energy",
+    h    = root.TH1D(f"en{i}", f"Detector {i} energy",
                      nBins, 0, eMax)
     histos.append(h)
 
 histoAll = root.TH1D('enAll', 'Array Energy',
                      nBins, 0, eMax)
-
-gam_gam = root.TH2F("gamma_gamma", "Coincidence Matrix",
-                    int(nBins/4), 0, eMax,
-                    int(nBins/4), 0, eMax)
-cut_1332 = root.TH1F("cut_1332", "1332 keV cut", nBins, 0, eMax)
 
 Sort(sys.argv[1], nDet)
 
@@ -121,7 +99,7 @@ outFile = root.TFile(outFileName, "RECREATE")
 for i in range(nDet):
     histosRaw[i].Write()
     histos[i].Write()
-gam_gam.Write()
-cut_1332.Write()
+
 histoAll.Write()
+
 outFile.Close()

@@ -1,8 +1,10 @@
 
 # Geometry =====================================================================
+/Chamber/Construct
 /CeBr3/GeometryFile demonstrator.geo
 
 # Processes ====================================================================
+/Source/Simple 5000 keV
 
 # Produce Auger electrons and X-rays
 /process/em/auger true
@@ -12,9 +14,5 @@
 # Initialize run manager =======================================================
 /run/initialize
 
-# Initialize the source ========================================================
-/gun/particle ion
-/gun/ion 27 60
-
-/Output/Filename co60.out
-/run/beamOn 1000000
+/Output/Filename e5000_chamber+pipe.out
+/run/beamOn 10000000

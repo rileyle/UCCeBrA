@@ -1,5 +1,8 @@
-/Chamber/Construct
 /CeBr3/GeometryFile demonstrator.geo
+/Chamber/Construct
+
+/Brick/GeometryFile bricks.geo
+/Brick/Construct 
 
 # Initialize run manager =======================================================
 /run/initialize

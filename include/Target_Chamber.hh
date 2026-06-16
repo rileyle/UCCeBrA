@@ -5,10 +5,15 @@
 #include "Materials.hh"
 #include "G4Tubs.hh"
 #include "G4Sphere.hh"
+#include "G4Polycone.hh"
+#include "G4UnionSolid.hh"
+#include "G4SubtractionSolid.hh"
+#include "G4ExtrudedSolid.hh"
 #include "CADMesh.hh"
 #include "G4LogicalVolume.hh"
 #include "G4VPhysicalVolume.hh"
 #include "G4ThreeVector.hh"
+#include "G4TwoVector.hh"
 #include "G4PVPlacement.hh"
 
 #include "G4VisAttributes.hh"
@@ -31,18 +36,238 @@ public:
   ~Target_Chamber();
 
   void Construct();
-  
-  G4double Radius;      // Outer
-  G4double Thickness;
-  
-  G4Material* Al;
 
-  G4ThreeVector Pos;
+  //Target Chamber
+  /*G4double Radius;      // Outer (sphere)
+  G4double Thickness;*/ 
+
+  G4double Hemi_Radius;      // Outer
+  G4double Hemi_Thickness;
+
+  G4double Mid_Radius;     //Outer
+  G4double Mid_Thickness;
+  G4double Mid_Length;
+
+  G4double Ring_Radius;     //Outer
+  G4double Ring_Thickness;
+  G4double Ring_Length;
+  
+  G4double End_Radius;     //Outer
+  G4double End_Thickness;
+  G4double End_Length;
+
+  //Beam Pipe
+  G4double BPRadius;
+  G4double BPThickness;
+  G4double BPLength;
+
+  //Gate Valve Elements
+  G4double GateValve_Length;
+  G4double GateValve_Width;
+  G4double GateValve_Depth;
+
+  G4double ValveCap_Length;
+  G4double ValveCap_Width;
+  G4double ValveCap_Depth;
+
+  /*G4double Barrel_Radius
+  G4double Barrel_Length
+  
+  G4double Join_TRadius //Outer
+  G4double Join_BRadius
+  G4double Join_Length*/
+
+  //KF50 Flange
+  static const G4int fNumZPlanes = 5;
+  G4double fZPlane[fNumZPlanes];
+  G4double fRInner[fNumZPlanes];
+  G4double fROuter[fNumZPlanes];
+
+  //Hole
+  G4double FDrill_Radius;
+  G4double FDrill_Length;
+  G4double FDrill_Thickness;
+
+  //KF50 Clamp
+  static const G4int NumCPlanes = 6; 
+  G4double CPlane[NumCPlanes];
+  G4double CInner[NumCPlanes];
+  G4double COuter[NumCPlanes];
+
+  G4double CBox_Length; 
+  G4double CBox_Width;
+  G4double CBox_Depth;
+
+  //KF40 Clamp
+  G4double C40Plane[NumCPlanes];
+  G4double C40Inner[NumCPlanes];
+  G4double C40Outer[NumCPlanes];
+
+  //Support Tube
+  G4double Support_Radius;
+  G4double Support_Length;
+
+  //Piece between support tube and base
+  G4double Flat_Radius;
+  G4double Flat_Length;
+
+  //Base
+  G4double Base_Radius;
+  G4double Base_Length;
+
+  //Wings
+  G4double Wing_Radius;
+  G4double Wing_Length;
+  G4double Wing_Thickness;
+
+
+
+  G4Material* Al;
+  G4Material* Steel = G4NistManager::Instance()->FindOrBuildMaterial("G4_STAINLESS-STEEL");
+
+  G4double startAngle; 
+  G4double spanningAngle; 
+
+  //G4ThreeVector Pos; //(sphere)
+
+  G4ThreeVector Hemi_Pos;
+  //G4RotationMatrix Hemi_Rot;
+  
+  G4ThreeVector Mid_Shift;
+  //G4RotationMatrix Mid_Rot;
+  
+  G4ThreeVector Ring_Shift;
+ // G4RotationMatrix Ring_Rot;
+
+  G4ThreeVector End_Shift;
   G4RotationMatrix Rot;
+
+  G4ThreeVector BPShift;
+  G4RotationMatrix BPRot;
+
+  G4ThreeVector Main_Shift;
+  G4ThreeVector Box_Shift;
+
+  G4ThreeVector KF50_Shift;
+  G4RotationMatrix KF50_Rot;
+  G4RotationMatrix FDrill_Rot;
+
+  G4ThreeVector FDrill_Shift;
+
+  G4ThreeVector LKF50_Shift;
+  G4RotationMatrix LKF50_Rot;
+
+  G4ThreeVector GateValve_Shift;
+  G4ThreeVector ValveCap_Shift;
+  G4RotationMatrix GateValve_Rot;
+  G4RotationMatrix ValveCap_Rot;
+  G4RotationMatrix GDrill_Rot;
+  G4ThreeVector GDrill_Shift;
+  G4ThreeVector GKF50_Shift;
+  G4ThreeVector Test_Shift;
+
+  G4ThreeVector Clamp_Shift;
+  G4RotationMatrix Clamp_Rot;
+  G4ThreeVector RCBox_Shift;
+  G4ThreeVector LCBox_Shift;
+  G4RotationMatrix CBox_Rot;
+
+  G4ThreeVector BPClamp_Shift;
+  G4ThreeVector R40CBox_Shift;
+  G4ThreeVector L40CBox_Shift;
+
+  G4ThreeVector Support_Shift;
+
+  G4ThreeVector Flat_Shift;
+
+  G4ThreeVector Base_Shift;
+
+  G4ThreeVector LBKF50_Shift;
+  G4RotationMatrix LBKF50_Rot;
+
+  G4ThreeVector Wing_Shift;
+  G4RotationMatrix LeftWing_Rot;
+  G4RotationMatrix RightWing_Rot;
+
+  G4ThreeVector L90_Shift;
+  G4ThreeVector R90_Shift;
+  G4ThreeVector L270_Shift;
+  G4ThreeVector R270_Shift;
+  G4RotationMatrix M270_Rot;
+  G4ThreeVector R220_Shift;
+  G4ThreeVector L220_Shift;
+  G4RotationMatrix M220_Rot;
+  G4ThreeVector R142_Shift;
+  G4ThreeVector L142_Shift;
+  G4RotationMatrix M142_Rot;
+
+  G4LogicalVolume*  Hemi_log;
+  G4VPhysicalVolume* Hemi_phys;
   
-  G4LogicalVolume*  chamber_log;
-  G4VPhysicalVolume* chamber_phys;
+  G4LogicalVolume*  Mid_log;
+  G4VPhysicalVolume* Mid_phys;
   
+  G4LogicalVolume*  Ring_log;
+  G4VPhysicalVolume* Ring_phys;
+
+  G4LogicalVolume*  End_log;
+  G4VPhysicalVolume* End_phys;
+
+  //G4LogicalVolume*  chamber_log;
+  //G4VPhysicalVolume* chamber_phys;
+  
+  G4LogicalVolume*  pipe_log;
+  G4VPhysicalVolume* pipe_phys;
+
+  G4LogicalVolume*  Main_log;
+  G4VPhysicalVolume* Box_phys;
+
+  G4LogicalVolume*  Bowl_log;
+  G4VPhysicalVolume* Bowl_phys;
+
+  G4LogicalVolume* KF50_log;
+  G4VPhysicalVolume* KF50_phys;
+  G4VPhysicalVolume* LKF50_phys;
+
+  G4LogicalVolume* Both_log;
+  G4VPhysicalVolume* Both_phys;
+
+  G4LogicalVolume* GateValve_log;
+  G4VPhysicalVolume* GateValve_phys;
+
+  G4LogicalVolume* Clamp_log;
+  G4VPhysicalVolume* Clamp_phys;
+
+  G4LogicalVolume* Clamp40_log;
+  G4VPhysicalVolume* BPClamp_phys;
+
+  G4LogicalVolume* Test_log;
+  G4VPhysicalVolume* Test_phys;
+
+  G4LogicalVolume* Support_log;
+  G4VPhysicalVolume* Support_phys;
+
+  G4LogicalVolume* Flat_log;
+  G4VPhysicalVolume* Flat_phys;
+
+  G4LogicalVolume* Base_log;
+  G4VPhysicalVolume* Base_phys;
+
+  G4VPhysicalVolume* LBKF50_phys;
+
+  G4LogicalVolume* Wing_log;
+  G4VPhysicalVolume* RightWing_phys;
+  G4VPhysicalVolume* LeftWing_phys;
+
+  G4LogicalVolume* Mount_log;
+  G4VPhysicalVolume* L90_phys;
+  G4VPhysicalVolume* R90_phys;
+  G4VPhysicalVolume* L270_phys;
+  G4VPhysicalVolume* R270_phys;
+  G4VPhysicalVolume* L220_phys;
+  G4VPhysicalVolume* R220_phys;
+  G4VPhysicalVolume* L142_phys;
+  G4VPhysicalVolume* R142_phys;
 };
 
 #endif
