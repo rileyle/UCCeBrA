@@ -1,3 +1,12 @@
+/*This document includes all peices of the CeBrA array that we deemed 
+necessary to simulate as of August 2026 (except the lead bricks and the detectors
+themselves which have their own files). We have decided that the guage cross 
+that hangs over the detectors is not necessary to inlcude, but the code for
+it is still here if that changes. In order to get rid of a peice of the sim,
+just comment out its log and phys lines. Some of the peices here are rudementary
+and do not fully represent what the dead material is in real life but we have 
+determined that the level of precision here is adequate.*/
+
 #include "Target_Chamber.hh"
 
 Target_Chamber::Target_Chamber(G4LogicalVolume* experimentalHall_log,
@@ -9,7 +18,7 @@ Target_Chamber::Target_Chamber(G4LogicalVolume* experimentalHall_log,
   Al = materials->FindMaterial("Al");
 
 
-  //Sphere
+  //Spherical Target Chamber
   /*Radius    = 4.05*2.54*cm;
   Thickness = 1.75*mm;*/
 
@@ -18,7 +27,7 @@ Target_Chamber::Target_Chamber(G4LogicalVolume* experimentalHall_log,
   BPThickness = .2*2.54*cm;
   BPLength = 4.035 * 2.54 * cm;
 
-  //Hemisphere
+  //Hemispherical Target Chamber
   Hemi_Radius    = 4.0*2.54*cm;
   Hemi_Thickness = .2*2.54*cm;
 
@@ -37,12 +46,12 @@ Target_Chamber::Target_Chamber(G4LogicalVolume* experimentalHall_log,
   End_Thickness = 2 * cm;
   End_Length = .25 *2.54* cm;
 
-  //KF Flange
+  //KF50 Flange
   fZPlane[0] = 0.00 * cm;   fZPlane[1] = 0.254 * cm;  fZPlane[2] = 0.3048 * cm; fZPlane[3] = 0.508 * cm;  fZPlane[4] = 1.905 * cm;
   fRInner[0] = 2.6289 * cm; fRInner[1] = 2.6289 * cm; fRInner[2] = 2.3114 * cm; fRInner[3] = 2.3114 * cm; fRInner[4] = 2.3114 * cm;
   fROuter[0] = 3.7465 * cm; fROuter[1] = 3.7465 * cm; fROuter[2] = 3.7465 * cm; fROuter[3] = 2.6289 * cm; fROuter[4] = 2.6289 * cm;
 
-  //KF Flange Hole
+  //KF50 Flange Hole
   FDrill_Radius = 2.6289 * cm;
   FDrill_Length = 15 * cm; 
   FDrill_Thickness = .2*2.54*cm;
@@ -62,11 +71,12 @@ Target_Chamber::Target_Chamber(G4LogicalVolume* experimentalHall_log,
   CInner[0] = 35 * mm; CInner[1] = 35 * mm; CInner[2] = 40 * mm; CInner[3] = 40 * mm; CInner[4] = 35 * mm; CInner[5] = 35 * mm;
   COuter[0] = 46 * mm; COuter[1] = 46 * mm; COuter[2] = 46 * mm; COuter[3] = 46 * mm; COuter[4] = 46 * mm; COuter[5] = 46 * mm;
 
+  //Peices attached to clamps
   CBox_Length = 15.5 * mm;
   CBox_Width = 7.75 * mm;
   CBox_Depth = 7.75 * mm;
 
-  //KF40 Clamp
+  //KF40 Clamp on Beam Pipe
   C40Plane[0] = 0.00 * mm; C40Plane[1] = 5.5 * mm; C40Plane[2] = 5.5 * mm; C40Plane[3] = 16.5 * mm; C40Plane[4] = 16.5 * mm; C40Plane[5] = 22 * mm;
   C40Inner[0] = 26 * mm; C40Inner[1] = 26 * mm; C40Inner[2] = 31 * mm; C40Inner[3] = 31 * mm; C40Inner[4] = 26 * mm; C40Inner[5] = 26 * mm;
   C40Outer[0] = 37 * mm; C40Outer[1] = 37 * mm; C40Outer[2] = 37 * mm; C40Outer[3] = 37 * mm; C40Outer[4] = 37 * mm; C40Outer[5] = 37 * mm;
@@ -88,7 +98,25 @@ Target_Chamber::Target_Chamber(G4LogicalVolume* experimentalHall_log,
   Wing_Length = .19*2.54*cm;
   Wing_Thickness = 4.5*2.54*cm;
 
-  
+  //Ladder Tube
+  LTube_Radius = 2.6289 * cm;
+  LTube_Length = 4.5*2.54*cm;
+  LTube_Thickness = .2*2.54*cm;
+
+  //Guage Supports
+  Horizon_Radius = .375*2.54*cm;
+  Horizon_Length = 4.5*2.54*cm;
+
+  Meridian_Radius = .375*2.54*cm;
+  Meridian_Length = 4*2.54*cm;
+
+  Down_Radius = .375*2.54*cm;
+  Down_Length = 1*2.54*cm;
+
+  //Solid KF25 Clamps (uniform diameter, no actual KF flange)
+  KF25C_Radius = .875*2.54*cm;
+  KF25C_Length = 7*mm;
+  KF25C_Thickness = .5*2.54*cm;  
 
   //Sphere
   /*Pos.setX(0);
@@ -160,8 +188,8 @@ Target_Chamber::Target_Chamber(G4LogicalVolume* experimentalHall_log,
   L40CBox_Shift.setX(-45*mm);
   L40CBox_Shift.setZ(11*mm);
 
-  //Test
-  Test_Shift.setY(32.11*cm);
+  //Ladder Tube
+  LTube_Shift.setY(28.18*cm);
 
   //Support Tube
   Support_Shift.setY(-6.935*2.54*cm);
@@ -177,36 +205,80 @@ Target_Chamber::Target_Chamber(G4LogicalVolume* experimentalHall_log,
 
   //Mounts
   L90_Shift.setX(22*cm);
-  L90_Shift.setY(-5*cm);
+  L90_Shift.setY(-5.7*cm);
   L90_Shift.setZ(4.5*cm);
 
   R90_Shift.setX(22*cm);
-  R90_Shift.setY(-5*cm);
+  R90_Shift.setY(-5.7*cm);
   R90_Shift.setZ(-4.28*cm);
 
   L270_Shift.setX(-22*cm);
-  L270_Shift.setY(-5*cm);
+  L270_Shift.setY(-5.7*cm);
   L270_Shift.setZ(4.5*cm);
 
   R270_Shift.setX(-22*cm);
-  R270_Shift.setY(-5*cm);
+  R270_Shift.setY(-5.7*cm);
   R270_Shift.setZ(-4.28*cm);
 
   L220_Shift.setX(17.34*cm);
-  L220_Shift.setY(-5*cm);
+  L220_Shift.setY(-5.7*cm);
   L220_Shift.setZ(-13.54*cm);
 
   R220_Shift.setX(10.32*cm);
-  R220_Shift.setY(-5*cm);
+  R220_Shift.setY(-5.7*cm);
   R220_Shift.setZ(-19.42*cm);
 
-  L142_Shift.setX(-10.33*cm);
-  L142_Shift.setY(-5*cm);
-  L142_Shift.setZ(-19.43*cm);
+  L142_Shift.setX(-9.892*cm);
+  L142_Shift.setY(-5.7*cm);
+  L142_Shift.setZ(-20.282*cm);
 
   R142_Shift.setX(-16.85*cm);
-  R142_Shift.setY(-5*cm);
+  R142_Shift.setY(-5.7*cm);
   R142_Shift.setZ(-14.14*cm);
+
+  //Guage Supports
+  Horizon_Shift.setX(10.770 * cm);
+  Horizon_Shift.setY(36.308*cm);
+  Horizon_Shift.setZ(-9.037*cm);
+
+  Meridian_Shift.setX(7.851*cm);
+  Meridian_Shift.setY(35.038*cm);
+  Meridian_Shift.setZ(-6.588*cm);
+
+  Down_Shift.setX(14.661*cm);
+  Down_Shift.setY(33.133*cm);
+  Down_Shift.setZ(-12.302*cm);
+
+  //Cross Gauge Clamps (directions taken looking at the beam pipe side)
+  //Right
+  RKF25C_Shift.setX(3.96*cm);
+  RKF25C_Shift.setY(36.308*cm);
+  RKF25C_Shift.setZ(-3.323*cm);
+
+  //Left Middle
+  LMKF25C_Shift.setX(11.743*cm);
+  LMKF25C_Shift.setY(36.308*cm);
+  LMKF25C_Shift.setZ(-9.853*cm);
+
+  //Top
+  TKF25C_Shift.setX(7.851*cm);
+  TKF25C_Shift.setY(40.88*cm);
+  TKF25C_Shift.setZ(-6.588*cm);
+
+  //Very Bottom (Bottom Lower)
+  BLKF25C_Shift.setX(7.851*cm);
+  BLKF25C_Shift.setY(27.926*cm);
+  BLKF25C_Shift.setZ(-6.588*cm);
+
+  //Bottom Upper
+  BUKF25C_Shift.setX(7.851*cm);
+  BUKF25C_Shift.setY(31.736*cm);
+  BUKF25C_Shift.setZ(-6.588*cm);
+
+  //Left Down
+  LDKF25C_Shift.setX(14.661*cm);
+  LDKF25C_Shift.setY(31.736*cm);
+  LDKF25C_Shift.setZ(-12.302*cm);
 
 
 
@@ -216,10 +288,10 @@ Target_Chamber::Target_Chamber(G4LogicalVolume* experimentalHall_log,
   KF50_Rot.rotateX(90*deg);
 
   FDrill_Rot = G4RotationMatrix::IDENTITY;
-  FDrill_Rot.rotateX(91*deg); //91 instead of 90 so the drill shows across the union
+  FDrill_Rot.rotateX(90.01*deg); //90.01 instead of 90 so the drill shows across the union
 
   LKF50_Rot = G4RotationMatrix::IDENTITY;
-  LKF50_Rot.rotateY(-91*deg);
+  LKF50_Rot.rotateY(-90.01*deg);
 
   //Gate Valve
   GDrill_Rot = G4RotationMatrix::IDENTITY;
@@ -244,9 +316,11 @@ Target_Chamber::Target_Chamber(G4LogicalVolume* experimentalHall_log,
   CBox_Rot.rotateX(0);
   CBox_Rot.rotateZ(90*deg);
 
+  //Opp Flange Glass Port
   LBKF50_Rot = G4RotationMatrix::IDENTITY;
   LBKF50_Rot.rotateY(-270*deg);
 
+  //Wings
   LeftWing_Rot = G4RotationMatrix::IDENTITY;
   LeftWing_Rot.rotateX(90*deg);
   LeftWing_Rot.rotateY(90*deg);
@@ -255,6 +329,7 @@ Target_Chamber::Target_Chamber(G4LogicalVolume* experimentalHall_log,
   RightWing_Rot.rotateX(270*deg);
   RightWing_Rot.rotateY(90*deg); 
 
+  //Detector Mounts
   M270_Rot = G4RotationMatrix::IDENTITY;
   M270_Rot.rotateY(180*deg);
 
@@ -263,6 +338,11 @@ Target_Chamber::Target_Chamber(G4LogicalVolume* experimentalHall_log,
 
   M142_Rot = G4RotationMatrix::IDENTITY;
   M142_Rot.rotateY(-232*deg);
+
+  //Cross Guage
+  Horizon_Rot = G4RotationMatrix::IDENTITY;
+  Horizon_Rot.rotateY(130*deg);
+
 
 
 }
@@ -317,9 +397,9 @@ void Target_Chamber::Construct()
 
   G4Tubs* FDrill = new G4Tubs("FDrill", 0, FDrill_Radius, FDrill_Length, 0*deg, 360*deg);
   //FDrill_log = new G4LogicalVolume(FDrill, Steel, "FDrill_log");
-  G4Tubs* Test = new G4Tubs("Test", FDrill_Radius-FDrill_Thickness, FDrill_Radius, FDrill_Length, 0*deg, 360*deg);
-  Test_log = new G4LogicalVolume(Test, Steel, "Test_log");
-  Test_phys = new G4PVPlacement(G4Transform3D(FDrill_Rot, Test_Shift), Test_log, "Test", expHall_log, false, 0);
+  G4Tubs* LTube = new G4Tubs("LTube", LTube_Radius-LTube_Thickness, LTube_Radius, LTube_Length, 0*deg, 360*deg);
+  LTube_log = new G4LogicalVolume(LTube, Steel, "LTube_log");
+  LTube_phys = new G4PVPlacement(G4Transform3D(FDrill_Rot, LTube_Shift), LTube_log, "LTube", expHall_log, false, 0);
 
 
   G4SubtractionSolid* Top = new G4SubtractionSolid("Top", Bowl, FDrill, G4Transform3D(FDrill_Rot, FDrill_Shift));
@@ -349,17 +429,21 @@ void Target_Chamber::Construct()
                                 expHall_log, false, 0);
 
   
+  //KF50 Flanges
   G4Polycone* solidKF50 = new G4Polycone("KF50", 0.0*deg, 360.0*deg, fNumZPlanes, fZPlane, fRInner, fROuter);
 
   KF50_log = new G4LogicalVolume(solidKF50, Steel, "KF50_log");
 
+  //Flange on top of chamber
   KF50_phys = new G4PVPlacement(G4Transform3D(KF50_Rot, KF50_Shift),
                                   KF50_log, "KF50",
                                   expHall_log, false, 0);
 
+  //Glass Port Flanges                                
   LKF50_phys = new G4PVPlacement(G4Transform3D(LKF50_Rot, LKF50_Shift), KF50_log, "LKF50", expHall_log, false, 0);
   LBKF50_phys = new G4PVPlacement(G4Transform3D(LBKF50_Rot, LBKF50_Shift), KF50_log, "LBKF50", expHall_log, false, 0);
   
+  //Gate Valve
   G4Box* GateBox = new G4Box("GateBox", GateValve_Length, GateValve_Width, GateValve_Depth);
   G4Box* ValveCap = new G4Box("GateCap", ValveCap_Length, ValveCap_Width, ValveCap_Depth);
   G4UnionSolid* T = new G4UnionSolid("T", GateBox, ValveCap, G4Transform3D(ValveCap_Rot, ValveCap_Shift));
@@ -370,7 +454,7 @@ void Target_Chamber::Construct()
 
   GateValve_phys = new G4PVPlacement(G4Transform3D(GateValve_Rot, GateValve_Shift), GateValve_log, "GateValve", expHall_log, false, 0);
 
-
+  //Clamp on Gate Valve
   G4Polycone* CRing = new G4Polycone("CRing", 0.0*deg, 360.0*deg, NumCPlanes, CPlane, CInner, COuter);
   G4Box* CBox = new G4Box("CBox", CBox_Length, CBox_Width, CBox_Depth);
   G4UnionSolid* Left = new G4UnionSolid("Left", CRing, CBox, G4Transform3D(CBox_Rot, LCBox_Shift));
@@ -380,7 +464,7 @@ void Target_Chamber::Construct()
 
   Clamp_phys = new G4PVPlacement(G4Transform3D(Clamp_Rot, Clamp_Shift), Clamp_log, "Clamp", expHall_log, false, 0);
 
-
+  //Clamp on Beam Pipe
   G4Polycone* C40Ring = new G4Polycone("C40Ring", 0.0*deg, 360.0*deg, NumCPlanes, C40Plane, C40Inner, C40Outer);
   G4UnionSolid* Left40 = new G4UnionSolid("Left40", C40Ring, CBox, G4Transform3D(CBox_Rot, L40CBox_Shift));
   G4UnionSolid* Clamp40 = new G4UnionSolid("Clamp40", Left40, CBox, G4Transform3D(CBox_Rot, R40CBox_Shift));
@@ -389,28 +473,28 @@ void Target_Chamber::Construct()
 
   BPClamp_phys = new G4PVPlacement(G4Transform3D(Rot, BPClamp_Shift), Clamp40_log, "BPClamp", expHall_log, false, 0);
 
-
+  //Support Pipe
   G4Tubs* Support = new G4Tubs("Support", 0, Support_Radius, Support_Length, 0*deg, 360*deg);
 
   Support_log = new G4LogicalVolume(Support, Steel, "Support_log");
 
   Support_phys = new G4PVPlacement(G4Transform3D(FDrill_Rot, Support_Shift), Support_log, "Support", expHall_log, false, 0);
 
-
+  //Small Peice Above Base
   G4Tubs* Flat = new G4Tubs("Flat", 0, Flat_Radius, Flat_Length, 0*deg, 360*deg);
 
   Flat_log = new G4LogicalVolume(Flat, Steel, "Flat_log");
 
   Flat_phys = new G4PVPlacement(G4Transform3D(FDrill_Rot, Flat_Shift), Flat_log, "Flat", expHall_log, false, 0);
 
-
+  //Base
   G4Tubs* Base = new G4Tubs("Base", 0, Base_Radius, Base_Length, 0*deg, 360*deg);
 
   Base_log = new G4LogicalVolume(Base, Steel, "Base_log");
 
   Base_phys = new G4PVPlacement(G4Transform3D(FDrill_Rot, Base_Shift), Base_log, "Base", expHall_log, false, 0);
 
-
+  //Wings
   G4Tubs* Wing = new G4Tubs("Wing", Wing_Radius-Wing_Thickness, Wing_Radius, Wing_Length, 23.97*deg, 67.5*deg);
 
   Wing_log = new G4LogicalVolume(Wing, Steel, "Wing_log");
@@ -444,6 +528,30 @@ void Target_Chamber::Construct()
   R220_phys = new G4PVPlacement(G4Transform3D(M220_Rot, R220_Shift), Mount_log, "R220", expHall_log, false, 0);
   L142_phys = new G4PVPlacement(G4Transform3D(M142_Rot, L142_Shift), Mount_log, "L142", expHall_log, false, 0);
   R142_phys = new G4PVPlacement(G4Transform3D(M142_Rot, R142_Shift), Mount_log, "R142", expHall_log, false, 0);
+
+  //Guage Supports
+  /*G4Tubs* Horizon = new G4Tubs("Horizon", 0, Horizon_Radius, Horizon_Length, 0*deg, 360*deg);
+  Horizon_log = new G4LogicalVolume(Horizon, Steel, "Horizon_log");
+  Horizon_phys = new G4PVPlacement(G4Transform3D(Horizon_Rot, Horizon_Shift), Horizon_log, "Horizon", expHall_log, false, 0);
+
+  G4Tubs* Meridian = new G4Tubs("Meridian", 0, Meridian_Radius, Meridian_Length, 0*deg, 360*deg);
+  Meridian_log = new G4LogicalVolume(Meridian, Steel, "Meridian_log");
+  Meridian_phys = new G4PVPlacement(G4Transform3D(Clamp_Rot, Meridian_Shift), Meridian_log, "Meridian", expHall_log, false, 0);
+
+  G4Tubs* Down = new G4Tubs("Down", 0, Down_Radius, Down_Length, 0*deg, 360*deg);
+  Down_log = new G4LogicalVolume(Down, Steel, "Down_log");
+  Down_phys = new G4PVPlacement(G4Transform3D(Clamp_Rot, Down_Shift), Down_log, "Down", expHall_log, false, 0);
+
+  G4Tubs* KF25C = new G4Tubs("KF25C", KF25C_Radius-KF25C_Thickness, KF25C_Radius, KF25C_Length, 0*deg, 360*deg);
+  KF25C_log = new G4LogicalVolume(KF25C, Al, "KF25C_log");
+  RKF25C_phys = new G4PVPlacement(G4Transform3D(Horizon_Rot, RKF25C_Shift), KF25C_log, "RKF25C", expHall_log, false, 0);
+  LMKF25C_phys = new G4PVPlacement(G4Transform3D(Horizon_Rot, LMKF25C_Shift), KF25C_log, "LMKF25C", expHall_log, false, 0); 
+  TKF25C_phys = new G4PVPlacement(G4Transform3D(Clamp_Rot, TKF25C_Shift), KF25C_log, "TKF25C", expHall_log, false, 0); 
+  BUKF25C_phys = new G4PVPlacement(G4Transform3D(Clamp_Rot, BUKF25C_Shift), KF25C_log, "BUKF25C", expHall_log, false, 0); 
+  BLKF25C_phys = new G4PVPlacement(G4Transform3D(Clamp_Rot, BLKF25C_Shift), KF25C_log, "BLKF25C", expHall_log, false, 0); 
+  LDKF25C_phys = new G4PVPlacement(G4Transform3D(Clamp_Rot, LDKF25C_Shift), KF25C_log, "LDKF25C", expHall_log, false, 0); */
+
+
 
 
   

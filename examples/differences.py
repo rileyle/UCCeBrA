@@ -43,7 +43,7 @@ for i in range (9):
 diffAll = enAll1.Clone('diffAll')
 diffAll.Add(enAll2, -1)
 
-output_file = root.TFile.Open('TITLE!!.root', 'create')
+output_file = root.TFile.Open('TITLE!!.root', 'recreate')
 
 for i in range (9):
     difflist[i].Write()
@@ -53,6 +53,5 @@ diffAll.Write()
 output_file.Close()
 print(f'Saved differences to {output_file}')
 
-#diffAll.Rebin(8)
-#diffAll.Draw()
-#difflist[0].Draw()
+diffAll.Rebin(50)
+diffAll.Draw()

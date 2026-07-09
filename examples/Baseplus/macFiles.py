@@ -6,17 +6,17 @@ import shutil
 
 N = 1e7
 
-energies = [186.21,  295.224,  351.932, 609.321,   768.36,
-            806.17,   839.04, 1120.294, 1238.11,  1377.67,
-            1407.98, 1509.21, 1764.491, 1847.42, 2118.513,
-            2204.21, 2447.69]
+energies = [1000, 5000, 10000]
 
 print(f'{len(energies)} peaks')
 
 macro="""
 # Geometry =====================================================================
-/Bench/Construct
-/CeBr3/GeometryFile geology.geo
+/Chamber/Construct
+/CeBr3/GeometryFile demonstrator.geo
+
+/Brick/Construct
+/CeBr3/GeometryFile bricks.geo
 
 /Source/Simple {en} keV
 

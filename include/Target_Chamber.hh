@@ -120,6 +120,23 @@ public:
   G4double Wing_Length;
   G4double Wing_Thickness;
 
+  //Ladder Tube
+  G4double LTube_Radius;
+  G4double LTube_Length;
+  G4double LTube_Thickness;
+
+  //Guage Supports
+  G4double Horizon_Radius;
+  G4double Horizon_Length;
+  
+  G4double Meridian_Radius;
+  G4double Meridian_Length;
+  G4double Down_Radius;
+  G4double Down_Length;
+
+  G4double KF25C_Radius;
+  G4double KF25C_Length;
+  G4double KF25C_Thickness;
 
 
   G4Material* Al;
@@ -164,7 +181,7 @@ public:
   G4RotationMatrix GDrill_Rot;
   G4ThreeVector GDrill_Shift;
   G4ThreeVector GKF50_Shift;
-  G4ThreeVector Test_Shift;
+  G4ThreeVector LTube_Shift;
 
   G4ThreeVector Clamp_Shift;
   G4RotationMatrix Clamp_Rot;
@@ -189,6 +206,7 @@ public:
   G4RotationMatrix LeftWing_Rot;
   G4RotationMatrix RightWing_Rot;
 
+  //Detector Mounts
   G4ThreeVector L90_Shift;
   G4ThreeVector R90_Shift;
   G4ThreeVector L270_Shift;
@@ -200,6 +218,20 @@ public:
   G4ThreeVector R142_Shift;
   G4ThreeVector L142_Shift;
   G4RotationMatrix M142_Rot;
+
+  //Cross Gauage
+  G4RotationMatrix Horizon_Rot;
+  G4ThreeVector Horizon_Shift;
+  G4ThreeVector Meridian_Shift;
+  G4ThreeVector Down_Shift;
+
+  G4ThreeVector RKF25C_Shift;
+  G4ThreeVector LMKF25C_Shift;
+  G4ThreeVector TKF25C_Shift;
+  G4ThreeVector BUKF25C_Shift;
+  G4ThreeVector BLKF25C_Shift;
+  G4ThreeVector LDKF25C_Shift;
+
 
   G4LogicalVolume*  Hemi_log;
   G4VPhysicalVolume* Hemi_phys;
@@ -241,8 +273,8 @@ public:
   G4LogicalVolume* Clamp40_log;
   G4VPhysicalVolume* BPClamp_phys;
 
-  G4LogicalVolume* Test_log;
-  G4VPhysicalVolume* Test_phys;
+  G4LogicalVolume* LTube_log;
+  G4VPhysicalVolume* LTube_phys;
 
   G4LogicalVolume* Support_log;
   G4VPhysicalVolume* Support_phys;
@@ -268,6 +300,21 @@ public:
   G4VPhysicalVolume* R220_phys;
   G4VPhysicalVolume* L142_phys;
   G4VPhysicalVolume* R142_phys;
+
+  G4LogicalVolume* Horizon_log;
+  G4VPhysicalVolume* Horizon_phys;
+  G4LogicalVolume* Meridian_log;
+  G4VPhysicalVolume* Meridian_phys;
+  G4LogicalVolume* Down_log;
+  G4VPhysicalVolume* Down_phys;
+
+  G4LogicalVolume* KF25C_log;
+  G4VPhysicalVolume* RKF25C_phys;
+  G4VPhysicalVolume* LMKF25C_phys;
+  G4VPhysicalVolume* TKF25C_phys;
+  G4VPhysicalVolume* BUKF25C_phys;
+  G4VPhysicalVolume* BLKF25C_phys;
+  G4VPhysicalVolume* LDKF25C_phys;
 };
 
 #endif
