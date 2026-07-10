@@ -94,9 +94,11 @@ def Sort(fileName, nDet=1):
 
                     # 1332 keV cut
                     if eRes > 1260 and eRes < 1400:
-                        cut_1332.Fill(lastEnergy)
+                        cut_1332[lastDet].Fill(lastEnergy)
+                        cut_1332_all.Fill(lastEnergy)
                     if lastEnergy > 1260 and lastEnergy < 1400:
-                        cut_1332.Fill(eRes)
+                        cut_1332[det].Fill(eRes)
+                        cut_1332_all.Fill(eRes)
         
                 lastEvent = event
                 lastDet = det
@@ -137,6 +139,7 @@ nDet, sigmaPars, eMax, nBins = readInputFile()
 # Create histograms
 histos = []
 histosRaw = []
+cut_1332 = []
 for i in range(nDet):
     hRaw = root.TH1F(f"enRaw{i}", f"Detector {i} energy",
                      nBins, 0, eMax)
@@ -144,11 +147,14 @@ for i in range(nDet):
     h    = root.TH1F(f"en{i}", f"Detector {i} energy",
                      nBins, 0, eMax)
     histos.append(h)
-
+    c    = root.TH1F(f"cut_1332_{i}", f"1332 keV cut, detector {i}",
+                     nBins, 0, eMax)
+    cut_1332.append(c)
+    
 gam_gam = root.TH2F("gamma_gamma", "Coincidence Matrix",
                     int(nBins/4), 0, eMax,
                     int(nBins/4), 0, eMax)
-cut_1332 = root.TH1F("cut_1332", "1332 keV cut", nBins, 0, eMax)
+cut_1332_all = root.TH1F("cut_1332_all", "1332 keV cut", nBins, 0, eMax)
 
 emitted_delta_theta = root.TH1F("emitted_delta_theta", "emitted_delta_theta",
                                 180, 0, 180)
@@ -165,8 +171,9 @@ outFile = root.TFile(outFileName, "RECREATE")
 for i in range(nDet):
     histosRaw[i].Write()
     histos[i].Write()
+    cut_1332[i].Write()
 gam_gam.Write()
-cut_1332.Write()
+cut_1332_all.Write()
 emitted_delta_theta.Write()
 emitted_theta1.Write()
 
