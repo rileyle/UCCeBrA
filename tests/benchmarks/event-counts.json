@@ -1,0 +1,4 @@
+{
+  "cs137_simple": {"expected_events": 10000},
+  "co60":         {"expected_events": 10000}
+}
