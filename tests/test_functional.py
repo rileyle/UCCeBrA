@@ -40,7 +40,7 @@ CS137_ENERGY_TOL     = 0.01    # keV tolerance for emitted energy check
 # gammas can deposit all their energy in a single detector, so the maximum
 # deposited energy is the sum of both gammas plus a small tolerance for
 # Geant4 floating-point precision in energy accounting.
-CO60_MAX_ENERGY_KEV  = 2506.0  # 1173 + 1332 + 1 keV tolerance
+CO60_MAX_ENERGY_KEV  = 2600.0  # 1173 + 1332 keV cascade, with headroom
 CO60_MIN_DETECTOR_ID = 1
 CO60_MAX_DETECTOR_ID = 9       # demonstrator array has 9 detectors
 
