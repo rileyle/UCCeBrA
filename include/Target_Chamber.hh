@@ -83,6 +83,16 @@ public:
   G4double fRInner[fNumZPlanes];
   G4double fROuter[fNumZPlanes];
 
+  static const G4int NumZPlanes = 6;
+  G4double ZPlane[NumZPlanes];
+  G4double RInner[NumZPlanes];
+  G4double ROuter[NumZPlanes];
+
+  static const G4int WNumZPlanes = 3;
+  G4double WZPlane[WNumZPlanes];
+  G4double WRInner[WNumZPlanes];
+  G4double WROuter[WNumZPlanes];
+
   //Hole
   G4double FDrill_Radius;
   G4double FDrill_Length;
@@ -138,9 +148,13 @@ public:
   G4double KF25C_Length;
   G4double KF25C_Thickness;
 
+  G4double Window_Radius;
+  G4double Window_Length;
+
 
   G4Material* Al;
   G4Material* Steel = G4NistManager::Instance()->FindOrBuildMaterial("G4_STAINLESS-STEEL");
+  G4Material* quartz;
 
   G4double startAngle; 
   G4double spanningAngle; 
@@ -170,6 +184,8 @@ public:
   G4RotationMatrix FDrill_Rot;
 
   G4ThreeVector FDrill_Shift;
+
+  G4ThreeVector Window_Shift;
 
   G4ThreeVector LKF50_Shift;
   G4RotationMatrix LKF50_Rot;
@@ -259,7 +275,12 @@ public:
 
   G4LogicalVolume* KF50_log;
   G4VPhysicalVolume* KF50_phys;
+  G4LogicalVolume* longKF50_log;
   G4VPhysicalVolume* LKF50_phys;
+  G4LogicalVolume* shortKF50_log;
+
+  G4LogicalVolume* Window_log;
+  G4VPhysicalVolume* Window_phys;
 
   G4LogicalVolume* Both_log;
   G4VPhysicalVolume* Both_phys;

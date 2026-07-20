@@ -18,6 +18,7 @@ Target_Chamber::Target_Chamber(G4LogicalVolume* experimentalHall_log,
   expHall_log=experimentalHall_log;
 
   Al = materials->FindMaterial("Al");
+  quartz = materials->FindMaterial("quartz");
 
 
   //Spherical Target Chamber
@@ -48,10 +49,20 @@ Target_Chamber::Target_Chamber(G4LogicalVolume* experimentalHall_log,
   End_Thickness = 2 * cm;
   End_Length = .25 *2.54* cm;
 
-  //KF50 Flange
+  //Regular KF50 Flange
   fZPlane[0] = 0.00 * cm;   fZPlane[1] = 0.254 * cm;  fZPlane[2] = 0.3048 * cm; fZPlane[3] = 0.508 * cm;  fZPlane[4] = 1.905 * cm;
   fRInner[0] = 2.6289 * cm; fRInner[1] = 2.6289 * cm; fRInner[2] = 2.3114 * cm; fRInner[3] = 2.3114 * cm; fRInner[4] = 2.3114 * cm;
   fROuter[0] = 3.7465 * cm; fROuter[1] = 3.7465 * cm; fROuter[2] = 3.7465 * cm; fROuter[3] = 2.6289 * cm; fROuter[4] = 2.6289 * cm;
+
+  //Long KF50 Flange for Window
+  ZPlane[0] = 0.00 * cm;   ZPlane[1] = 0.254 * cm;  ZPlane[2] = 0.3048 * cm; ZPlane[3] = 0.508 * cm;  ZPlane[4] = 1.905 * cm;  ZPlane[5] = 4.445 * cm;
+  RInner[0] = 2.6289 * cm; RInner[1] = 2.6289 * cm; RInner[2] = 2.3114 * cm; RInner[3] = 2.3114 * cm; RInner[4] = 2.3114 * cm; RInner[5] = 2.3114 * cm;
+  ROuter[0] = 3.7465 * cm; ROuter[1] = 3.7465 * cm; ROuter[2] = 3.7465 * cm; ROuter[3] = 2.6289 * cm; ROuter[4] = 2.6289 * cm; ROuter[5] = 2.6289 * cm;
+
+  //Short KF50 Window
+  WZPlane[0] = 0.00 * cm;   WZPlane[1] = 0.254 * cm;  WZPlane[2] = 0.3048 * cm;
+  WRInner[0] = 2.6289 * cm; WRInner[1] = 2.6289 * cm; WRInner[2] = 2.3114 * cm;
+  WROuter[0] = 3.7465 * cm; WROuter[1] = 3.7465 * cm; WROuter[2] = 3.7465 * cm;
 
   //KF50 Flange Hole
   FDrill_Radius = 2.6289 * cm;
@@ -118,7 +129,11 @@ Target_Chamber::Target_Chamber(G4LogicalVolume* experimentalHall_log,
   //Solid KF25 Clamps (uniform diameter, no actual KF flange)
   KF25C_Radius = .875*2.54*cm;
   KF25C_Length = 7*mm;
-  KF25C_Thickness = .5*2.54*cm;  
+  KF25C_Thickness = .5*2.54*cm;
+  
+  //Glass Window
+  Window_Radius = 2.6289 * cm;
+  Window_Length = .2*2.54*cm;
 
   //Sphere
   /*Pos.setX(0);
@@ -149,6 +164,9 @@ Target_Chamber::Target_Chamber(G4LogicalVolume* experimentalHall_log,
   KF50_Shift.setX(0);
   KF50_Shift.setY(12.327*cm);
   KF50_Shift.setZ(0);
+
+  //Glass Window
+  Window_Shift.setX(10.16*cm);
 
   //Flange for glass port
   LKF50_Shift.setX(14.327*cm);
@@ -436,14 +454,29 @@ void Target_Chamber::Construct()
 
   KF50_log = new G4LogicalVolume(solidKF50, Steel, "KF50_log");
 
+  G4Polycone* longKF50 = new G4Polycone("longKF50", 0.0*deg, 360.0*deg, NumZPlanes, ZPlane, RInner, ROuter);
+
+  longKF50_log = new G4LogicalVolume(longKF50, Steel, "longKF50_log");
+
   //Flange on top of chamber
   KF50_phys = new G4PVPlacement(G4Transform3D(KF50_Rot, KF50_Shift),
                                   KF50_log, "KF50",
                                   expHall_log, false, 0);
 
   //Glass Port Flanges                                
-  LKF50_phys = new G4PVPlacement(G4Transform3D(LKF50_Rot, LKF50_Shift), KF50_log, "LKF50", expHall_log, false, 0);
-  LBKF50_phys = new G4PVPlacement(G4Transform3D(LBKF50_Rot, LBKF50_Shift), KF50_log, "LBKF50", expHall_log, false, 0);
+  LKF50_phys = new G4PVPlacement(G4Transform3D(LKF50_Rot, LKF50_Shift), longKF50_log, "LKF50", expHall_log, false, 0);
+
+  G4Polycone* shortKF50 = new G4Polycone("shortKF50", 0.0*deg, 360.0*deg, WNumZPlanes, WZPlane, WRInner, WROuter);
+
+  shortKF50_log = new G4LogicalVolume(shortKF50, Steel, "shortKF50_log");
+  LBKF50_phys = new G4PVPlacement(G4Transform3D(LBKF50_Rot, LBKF50_Shift), shortKF50_log, "LBKF50", expHall_log, false, 0);
+
+  //Glass Window
+  G4Tubs* Window = new G4Tubs("Window",0*mm, Window_Radius, Window_Length, 0*deg, 360*deg);
+
+  Window_log = new G4LogicalVolume(Window, quartz, "Window_log");
+
+  Window_phys = new G4PVPlacement(G4Transform3D(LKF50_Rot, LBKF50_Shift), Window_log, "Window", expHall_log, false, 0);
   
   //Gate Valve
   G4Box* GateBox = new G4Box("GateBox", GateValve_Length, GateValve_Width, GateValve_Depth);
@@ -523,9 +556,9 @@ void Target_Chamber::Construct()
   Mount_log = new G4LogicalVolume(rawPlate, Steel, "Mount_log");
 
   L90_phys = new G4PVPlacement(G4Transform3D(Rot, L90_Shift), Mount_log, "L90", expHall_log, false, 0);
-  R90_phys = new G4PVPlacement(G4Transform3D(Rot, R90_Shift), Mount_log, "R90", expHall_log, false, 0);
+  //R90_phys = new G4PVPlacement(G4Transform3D(Rot, R90_Shift), Mount_log, "R90", expHall_log, false, 0);
   L270_phys = new G4PVPlacement(G4Transform3D(M270_Rot, L270_Shift), Mount_log, "L270", expHall_log, false, 0);
-  R270_phys = new G4PVPlacement(G4Transform3D(M270_Rot, R270_Shift), Mount_log, "R270", expHall_log, false, 0);
+  //R270_phys = new G4PVPlacement(G4Transform3D(M270_Rot, R270_Shift), Mount_log, "R270", expHall_log, false, 0);
   L220_phys = new G4PVPlacement(G4Transform3D(M220_Rot, L220_Shift), Mount_log, "L220", expHall_log, false, 0);
   R220_phys = new G4PVPlacement(G4Transform3D(M220_Rot, R220_Shift), Mount_log, "R220", expHall_log, false, 0);
   L142_phys = new G4PVPlacement(G4Transform3D(M142_Rot, L142_Shift), Mount_log, "L142", expHall_log, false, 0);
