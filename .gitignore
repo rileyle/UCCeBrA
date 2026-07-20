@@ -8,3 +8,7 @@ tmp*
 *.swp
 .vscode
 .DS_Store
+
+# Test suite temporary files
+tests/tmp/
+tests/ucce_test_*.mac
