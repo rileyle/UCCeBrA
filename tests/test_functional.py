@@ -73,7 +73,7 @@ class FunctionalTestCs137(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.binary = find_binary()
-        cls.tmpdir = tempfile.mkdtemp(prefix="ucce_func_cs137_")
+        cls.tmpdir = os.path.realpath(tempfile.mkdtemp(prefix="ucce_func_cs137_"))
         cls.outfile = os.path.join(cls.tmpdir, "func_cs137.out")
         cls.macfile = patch_mac(CS137_MAC, cls.outfile, FUNCTIONAL_EVENTS)
         rc, stdout, stderr, _ = run_simulation(
@@ -225,7 +225,7 @@ class FunctionalTestCo60(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.binary = find_binary()
-        cls.tmpdir = tempfile.mkdtemp(prefix="ucce_func_co60_")
+        cls.tmpdir = os.path.realpath(tempfile.mkdtemp(prefix="ucce_func_co60_"))
         cls.outfile = os.path.join(cls.tmpdir, "func_co60.out")
         cls.macfile = patch_mac(CO60_MAC, cls.outfile, FUNCTIONAL_EVENTS)
         rc, stdout, stderr, _ = run_simulation(

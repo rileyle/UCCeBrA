@@ -125,7 +125,7 @@ def _run_benchmark(mac_path, cwd, scenario):
     Cleans up temporary files before returning.
     """
     binary = find_binary()
-    tmpdir = tempfile.mkdtemp(prefix=f"ucce_bench_{scenario}_")
+    tmpdir = os.path.realpath(tempfile.mkdtemp(prefix=f"ucce_bench_{scenario}_"))
     outfile = os.path.join(tmpdir, f"bench_{scenario}.out")
     macfile = patch_mac(mac_path, outfile, BENCHMARK_EVENTS)
 
