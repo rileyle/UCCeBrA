@@ -361,3 +361,223 @@ def run_smoke():
         sys.exit(1)
     else:
         print("\nAll smoke tests passed.\n")
+
+
+# ---------------------------------------------------------------------------
+# Functional (sources) tests
+# ---------------------------------------------------------------------------
+
+FUNCTIONAL_EVENTS = 1000
+
+# Maps mode name -> list of (test_name, binary_name, base_macro_filename,
+#                            example_path, support_files, output_filename)
+FUNCTIONAL_CASES = {
+    "sources": [
+        (
+            "sources_cs137",
+            "UCCeBrA",
+            "func_sources_cs137.mac",
+            "examples/cs137/cs137_simple.mac",
+            [],  # no extra geometry files needed
+            "output.out",
+        ),
+        (
+            "sources_co60",
+            "UCCeBrA",
+            "func_sources_co60.mac",
+            "examples/co60/co60.mac",
+            ["demonstrator.geo", "bricks.geo"],  # demonstrator array geometry
+            "output.out",
+        ),
+    ],
+}
+
+
+def run_functional(mode):
+    """Run functional tests for a given mode, comparing output line counts
+    against stored baselines.
+
+    Line count is a proxy for detection rate (more detections = more output
+    lines). The tolerance is 2*sqrt(baseline) to accommodate Monte Carlo
+    statistical variation between runs.
+
+    Baselines are stored in tests/baselines.json. On first run, each test
+    auto-records its result as the baseline ([BASELINE SET]).
+
+    Exits 1 if any test fails.
+    """
+    print(f"\n=== test-{mode} ({FUNCTIONAL_EVENTS} events) ===")
+    baselines = load_baselines()
+    failures = 0
+
+    for (test_name, binary_name, macro_file,
+         example_path, support_files, out_file) in FUNCTIONAL_CASES[mode]:
+        binary = find_binary(binary_name)
+        workdir = setup_workdir(test_name, example_path, support_files)
+        write_base_macro(macro_file, example_path,
+                         f"/Output/Filename {out_file}", workdir)
+        wrapper = os.path.join(workdir, "run.mac")
+        write_run_macro(macro_file, FUNCTIONAL_EVENTS, wrapper)
+        stdout, stderr, returncode = run_sim(binary, wrapper, workdir)
+
+        ok, msg = _check_run_criteria(test_name, stdout, stderr, returncode)
+        if not ok:
+            print(msg)
+            failures += 1
+            continue
+
+        output_path = os.path.join(workdir, out_file)
+        if not os.path.isfile(output_path):
+            print(f"[FAIL] {test_name:<30} output file not created: {output_path}")
+            failures += 1
+            continue
+
+        observed = count_lines(output_path)
+        passed, msg = check_baseline(test_name, observed, baselines)
+        print(msg)
+        if not passed:
+            failures += 1
+
+    save_baselines(baselines)
+
+    if failures:
+        print(f"\n{failures} FAILED")
+        sys.exit(1)
+    else:
+        print(f"\nAll {mode} tests passed.\n")
+
+
+# ---------------------------------------------------------------------------
+# Benchmark tests
+# ---------------------------------------------------------------------------
+
+# Each entry: (variant_label, binary_name, base_macro_filename, example_path,
+#              support_files)
+BENCHMARK_CASES = [
+    (
+        "UCCeBrA_cs137",
+        "UCCeBrA",
+        "bench_cs137.mac",
+        "examples/cs137/cs137_simple.mac",
+        [],
+    ),
+    (
+        "UCCeBrA_co60",
+        "UCCeBrA",
+        "bench_co60.mac",
+        "examples/co60/co60.mac",
+        ["demonstrator.geo", "bricks.geo"],
+    ),
+]
+
+
+def run_benchmark(n_events):
+    """Run all scenarios for n_events and log events/sec to benchmark.log.
+
+    No pass/fail — this is for performance tracking over time.
+    Results are appended to benchmark.log (TSV, gitignored).
+    """
+    git_hash, git_branch = get_git_info()
+    cpu = get_cpu_info()
+    today = datetime.date.today().isoformat()
+
+    print(f"\n=== Benchmark ({n_events} events, commit {git_hash}, branch {git_branch}) ===")
+    print(f"CPU: {cpu}")
+    print(f"{'Variant':<20} {'Events/sec':>12}")
+    print("-" * 34)
+
+    rows = []
+
+    for variant, binary_name, macro_file, example_path, support_files in BENCHMARK_CASES:
+        binary = find_binary(binary_name)
+        workdir = setup_workdir(f"bench_{variant}", example_path, support_files)
+        write_base_macro(macro_file, example_path,
+                         "/Output/Filename output.out", workdir)
+        wrapper = os.path.join(workdir, "run.mac")
+        write_run_macro(macro_file, n_events, wrapper)
+        stdout, stderr, returncode = run_sim(binary, wrapper, workdir)
+
+        eps = parse_events_per_sec(stdout)
+        if eps is None or returncode != 0:
+            print(f"  {variant:<20} {'ERROR':>12}")
+            eps = 0
+        else:
+            print(f"  {variant:<20} {eps:>12.0f}")
+
+        rows.append((today, git_hash, git_branch, cpu, variant, n_events, f"{eps:.0f}"))
+
+    append_benchmark_log(rows)
+    print(f"\nResults appended to benchmark.log")
+
+
+# ---------------------------------------------------------------------------
+# Baseline update
+# ---------------------------------------------------------------------------
+
+def update_baselines():
+    """Re-run all functional tests and reset baselines to observed values.
+
+    Wipes baselines.json first so every test triggers [BASELINE SET].
+    If any test fails mid-update, the original baselines are restored.
+    """
+    print("Resetting all baselines...")
+    old_content = None
+    if os.path.isfile(BASELINES_FILE):
+        with open(BASELINES_FILE) as f:
+            old_content = f.read()
+    if os.path.isfile(BASELINES_FILE):
+        os.remove(BASELINES_FILE)
+    try:
+        for mode in ["sources"]:
+            run_functional(mode)
+    except SystemExit:
+        if old_content is not None:
+            with open(BASELINES_FILE, "w") as f:
+                f.write(old_content)
+            print("Baseline update failed — original baselines restored.")
+        raise
+    print("Baselines updated.")
+
+
+# ---------------------------------------------------------------------------
+# Entry point
+# ---------------------------------------------------------------------------
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="UCCeBrA test and benchmark driver"
+    )
+    parser.add_argument(
+        "--mode", required=False, default=None,
+        choices=["smoke", "sources", "benchmark"],
+        help="Test mode to run"
+    )
+    parser.add_argument(
+        "--events", type=int, default=10000,
+        help="Event count for benchmark mode (default: 10000)"
+    )
+    parser.add_argument(
+        "--update-baselines", action="store_true",
+        help="Reset all baselines to current observed values"
+    )
+    args = parser.parse_args()
+
+    if args.update_baselines:
+        update_baselines()
+        return
+
+    if args.mode is None:
+        parser.error("--mode is required unless --update-baselines is specified")
+
+    os.makedirs(TMP_DIR, exist_ok=True)
+
+    if args.mode == "smoke":
+        run_smoke()
+    elif args.mode == "sources":
+        run_functional("sources")
+    elif args.mode == "benchmark":
+        run_benchmark(args.events)
+
+
+if __name__ == "__main__":
+    main()
