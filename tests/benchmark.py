@@ -281,3 +281,83 @@ def append_benchmark_log(rows):
             f.write(header)
         for row in rows:
             f.write("\t".join(str(v) for v in row) + "\n")
+
+
+# ---------------------------------------------------------------------------
+# Smoke tests
+# ---------------------------------------------------------------------------
+
+SMOKE_EVENTS = 100
+
+# Each entry: (test_name, binary_name, base_macro_filename, example_path,
+#              support_files)
+# support_files are copied from the example's directory into tests/tmp/<name>/.
+SMOKE_CASES = [
+    (
+        "smoke_cs137",
+        "UCCeBrA",
+        "func_smoke_cs137.mac",
+        "examples/cs137/cs137_simple.mac",
+        [],  # cs137_simple.mac needs no extra geometry files
+    ),
+    (
+        "smoke_co60",
+        "UCCeBrA",
+        "func_smoke_co60.mac",
+        "examples/co60/co60.mac",
+        ["demonstrator.geo", "bricks.geo"],  # geometry files for the demonstrator array
+    ),
+]
+
+
+def _check_run_criteria(test_name, stdout, stderr, returncode):
+    """Check the four smoke pass criteria for a simulation run.
+
+    Checks:
+      1. Exit code is 0.
+      2. No fatal error strings in stdout or stderr.
+      3. End-of-run events/s line is present in stdout.
+      4. Events/sec > 0.
+
+    Returns:
+        Tuple of (passed: bool, message: str).
+    """
+    if returncode != 0:
+        return False, f"[FAIL] {test_name:<30} exit code {returncode}"
+    if check_fatal(stdout, stderr):
+        return False, f"[FAIL] {test_name:<30} fatal error in output"
+    eps = parse_events_per_sec(stdout)
+    if eps is None:
+        return False, f"[FAIL] {test_name:<30} end-of-run line not found"
+    if eps <= 0:
+        return False, f"[FAIL] {test_name:<30} events/sec = {eps}"
+    return True, f"[PASS] {test_name:<30} {eps:.0f} events/s"
+
+
+def run_smoke():
+    """Run all smoke tests and exit 1 if any fail.
+
+    Each smoke test runs SMOKE_EVENTS events and checks that the binary
+    exits cleanly with a valid events/sec rate. No output file validation.
+    """
+    print(f"\n=== test-smoke ({SMOKE_EVENTS} events) ===")
+    failures = 0
+
+    for test_name, binary_name, macro_file, example_path, support_files in SMOKE_CASES:
+        binary = find_binary(binary_name)
+        workdir = setup_workdir(test_name, example_path, support_files)
+        write_base_macro(macro_file, example_path,
+                         "/Output/Filename output.out", workdir)
+        wrapper = os.path.join(workdir, "run.mac")
+        write_run_macro(macro_file, SMOKE_EVENTS, wrapper)
+        stdout, stderr, returncode = run_sim(binary, wrapper, workdir)
+        ok, msg = _check_run_criteria(test_name, stdout, stderr, returncode)
+        print(msg)
+        if not ok:
+            failures += 1
+
+    if failures:
+        print(f"\n{failures} FAILED")
+        sys.exit(1)
+    else:
+        print("\nAll smoke tests passed.\n")
