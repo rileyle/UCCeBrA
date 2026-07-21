@@ -135,9 +135,13 @@ def parse_events_per_sec(stdout):
     The EventAction progress lines and the RunAction end-of-run line both
     print "NNN events/s". We take the last match to get the final value.
 
+    The end-of-run line uses C++ stream output which may produce scientific
+    notation (e.g. "2e+05 events/s") when the rate is large, so the regex
+    must match both plain decimals and scientific notation.
+
     Returns float, or None if the pattern is not found.
     """
-    matches = re.findall(r"([\d.]+)\s+events/s", stdout)
+    matches = re.findall(r"([\d.]+(?:[eE][+-]?\d+)?)\s+events/s", stdout)
     if matches:
         return float(matches[-1])
     return None
