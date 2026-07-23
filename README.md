@@ -234,4 +234,4 @@ runs functionality tests and collects event rates and detection ratios from 100,
 
     $ make test-baselines
 	
-runs 1,000,000-event simulations and writes detection ratios to `./tests/baselines.json` for comparison with future functionality tests.
+runs 1,000,000-event simulations and writes detection ratios to `./tests/baselines.json` for comparison with future functionality tests. These baselines should not change, within statistical uncertainties, unless the code is changed in a way that affects the total counts registering in the array.

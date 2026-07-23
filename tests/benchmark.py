@@ -245,11 +245,12 @@ def append_functional_log(rows):
     Writes a header line the first time the file is created.
     Each row is a tuple of values that will be joined with tabs.
     Columns: date, git_hash, git_branch, cpu, test_name, events,
-             ratio, sigma, baseline_ratio, baseline_sigma, n_sigma, verdict.
+             events_per_sec, ratio, sigma, baseline_ratio, baseline_sigma,
+             n_sigma, verdict.
     """
     header = (
         "date\tgit_hash\tgit_branch\tcpu\ttest_name\tevents\t"
-        "ratio\tsigma\tbaseline_ratio\tbaseline_sigma\tn_sigma\tverdict\n"
+        "events_per_sec\tratio\tsigma\tbaseline_ratio\tbaseline_sigma\tn_sigma\tverdict\n"
     )
     write_header = not os.path.isfile(FUNCTIONAL_LOG)
     with open(FUNCTIONAL_LOG, "a") as f:
@@ -476,6 +477,8 @@ def run_functional(mode):
             failures += 1
             continue
 
+        eps = parse_events_per_sec(stdout)
+
         output_path = os.path.join(workdir, out_file)
         if not os.path.isfile(output_path):
             print(f"[FAIL] {test_name:<30} output file not created: {output_path}")
@@ -497,7 +500,7 @@ def run_functional(mode):
                   f"(run make test-benchmark to set baseline)")
             log_rows.append((
                 today, git_hash, git_branch, cpu, test_name, FUNCTIONAL_EVENTS,
-                f"{ratio:.6f}", f"{sigma:.6f}",
+                f"{eps:.0f}", f"{ratio:.6f}", f"{sigma:.6f}",
                 "N/A", "N/A", "N/A", "NO BASELINE",
             ))
             continue
@@ -528,7 +531,7 @@ def run_functional(mode):
 
         log_rows.append((
             today, git_hash, git_branch, cpu, test_name, FUNCTIONAL_EVENTS,
-            f"{ratio:.6f}", f"{sigma:.6f}",
+            f"{eps:.0f}", f"{ratio:.6f}", f"{sigma:.6f}",
             f"{ratio_base:.6f}", f"{sigma_base:.6f}",
             f"{n_sigma:.4f}", verdict.strip("[]"),
         ))
