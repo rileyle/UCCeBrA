@@ -36,6 +36,13 @@ public:
   ~DetectorConstruction();
 
   G4VPhysicalVolume* Construct();
+
+  // Called per worker thread in MT mode (and once in serial mode) to register
+  // sensitive detectors. Moving SD registration here (from Construct()) is the
+  // standard Geant4 MT pattern that ensures each worker thread has its own SD
+  // instance properly registered in the thread-local G4SDManager.
+  void ConstructSDandField() override;
+
   Source_Capsule* getSourceCapsule(){return capsule;};
   Cradle* getCradle(){return cradle;};
   G4LogicalVolume* HallLog(){return ExpHall_log;};

@@ -72,10 +72,12 @@ G4VPhysicalVolume* Source_Capsule::Construct()
     capsule_log = new G4LogicalVolume(capsule, aluminum, "capsule_log",
 				      0, 0, 0);
   
-  }else if (capsuleType == "FSU_Ba133"){
+  } else if (capsuleType == "FSU_Ba133"){
     Length = 23.33*mm;
     Width = 11.13*mm;
     Depth = 2.4*mm;
+
+    // * To be implemented as a G4Box *
 
   } else {
 
@@ -84,8 +86,6 @@ G4VPhysicalVolume* Source_Capsule::Construct()
 
   }
   
-  PlaceCapsule();
-
   G4Colour dGrey (0.8, 0.8, 0.8, 1.0);
   G4VisAttributes* Vis = new G4VisAttributes(dGrey);
   Vis->SetVisibility(true);
@@ -93,15 +93,10 @@ G4VPhysicalVolume* Source_Capsule::Construct()
 
   capsule_log->SetVisAttributes(Vis);
 
-  return capsule_phys;
-}
-//---------------------------------------------------------------------
-void Source_Capsule::PlaceCapsule()
-{
-
   capsule_phys = new G4PVPlacement(G4Transform3D(Rot,Pos),
 				   capsule_log, "Capsule",
 				   expHall_log, false, 0); 
 
+  return capsule_phys;
 }
 //---------------------------------------------------------------------

@@ -62,22 +62,25 @@ class TrackerGammaHit : public G4VHit
 
 typedef G4THitsCollection<TrackerGammaHit> TrackerGammaHitsCollection;
 
-extern G4Allocator<TrackerGammaHit> TrackerGammaHitAllocator;
+// Thread-local allocator pointer: each worker thread gets its own G4Allocator
+// instance, avoiding data races in MT mode. Lazily initialised in operator new.
+extern G4ThreadLocal G4Allocator<TrackerGammaHit>* TrackerGammaHitAllocator;
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 inline void* TrackerGammaHit::operator new(size_t)
 {
-  void *aHit;
-  aHit = (void *) TrackerGammaHitAllocator.MallocSingle();
-  return aHit;
+  // Lazily create a per-thread allocator on first use.
+  if (!TrackerGammaHitAllocator)
+    TrackerGammaHitAllocator = new G4Allocator<TrackerGammaHit>;
+  return TrackerGammaHitAllocator->MallocSingle();
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-inline void TrackerGammaHit::operator delete(void *aHit)
+inline void TrackerGammaHit::operator delete(void* aHit)
 {
-  TrackerGammaHitAllocator.FreeSingle((TrackerGammaHit*) aHit);
+  TrackerGammaHitAllocator->FreeSingle((TrackerGammaHit*) aHit);
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

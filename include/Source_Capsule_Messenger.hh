@@ -19,17 +19,19 @@ class Source_Capsule_Messenger: public G4UImessenger
     void SetNewValue(G4UIcommand*, G4String);
     
   private:
-    Source_Capsule* capsule;
+    Source_Capsule*            capsule;
    
     G4UIdirectory*             Source_CapsuleDir;  
 
-    G4UIcmdWithAString* tCmd;
+    G4UIcmdWithAString*        tCmd;
     G4UIcmdWithADoubleAndUnit* rXCmd;
     G4UIcmdWithADoubleAndUnit* rYCmd;
     G4UIcmdWithADoubleAndUnit* rZCmd;
     G4UIcmdWithADoubleAndUnit* XCmd;
     G4UIcmdWithADoubleAndUnit* YCmd;
     G4UIcmdWithADoubleAndUnit* ZCmd;
+    G4UIcmdWithoutParameter*   CCmd;
+  
 };
 
 

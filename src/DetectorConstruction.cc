@@ -56,23 +56,33 @@ DetectorConstruction::~DetectorConstruction()
 
 G4VPhysicalVolume* DetectorConstruction::Construct()
 {
-
   the_CeBrA_Array->Construct();
+  return ExpHall_phys;
+}
 
-  //------------------------------------------------ 
-  // Sensitive detectors
-  //------------------------------------------------ 
-
+// ---------------------------------------------------------------------------
+// ConstructSDandField — called once per worker thread in MT mode, and once
+// on the main thread in serial mode. Creates and registers a per-thread
+// TrackerGammaSD instance so that each thread has its own hit collection.
+//
+// This is the standard Geant4 MT pattern for sensitive detectors. Moving SD
+// registration here (from Construct()) ensures the SD is properly associated
+// with the thread-local G4SDManager on each worker thread.
+//
+// PHYSICS NOTE: The SD type, name, and the volumes it is attached to are
+// unchanged from the serial implementation. This is a structural change only.
+// Human review is required before this change is considered production-ready.
+// ---------------------------------------------------------------------------
+void DetectorConstruction::ConstructSDandField()
+{
   G4SDManager* SDman = G4SDManager::GetSDMpointer();
 
-  //------------------------------------------------
-  // Detectors sensitive for gamma-ray tracking
-  //-------------------------------------------------
-
+  // Create a new TrackerGammaSD instance for this thread.
+  // Each worker thread must have its own SD instance; they are not shared.
   TrackerGamma = new TrackerGammaSD("GammaTracker");
   TrackerGammaSDMessenger = new TrackerGammaSD_Messenger(TrackerGamma);
   SDman->AddNewDetector(TrackerGamma);
-  the_CeBrA_Array->MakeSensitive(TrackerGamma);
 
-  return ExpHall_phys;
+  // Attach the SD to all CeBr3 crystal logical volumes in the array.
+  the_CeBrA_Array->MakeSensitive(TrackerGamma);
 }

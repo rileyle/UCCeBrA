@@ -6,7 +6,8 @@
 #include "G4Colour.hh"
 #include "G4VisAttributes.hh"
 
-G4Allocator<TrackerGammaHit> TrackerGammaHitAllocator;
+// Per-thread allocator instance. nullptr until first use on each thread.
+G4ThreadLocal G4Allocator<TrackerGammaHit>* TrackerGammaHitAllocator = nullptr;
 
 
 TrackerGammaHit::TrackerGammaHit() {}

@@ -1,7 +1,15 @@
-//PROGRAM MPP4
+//PROGRAM UCCeBrA
+// Conditional MT/serial run manager: G4MTRunManager when Geant4 was built
+// with multithreading support (G4MULTITHREADED defined by the build system),
+// G4RunManager otherwise.
+#ifdef G4MULTITHREADED
+#include "G4MTRunManager.hh"
+#include "G4Threading.hh"
+#else
 #include "G4RunManager.hh"
-#include "G4UImanager.hh"
+#endif
 
+#include "G4UImanager.hh"
 #include "G4UIterminal.hh"
 #include "G4UItcsh.hh"
 
@@ -11,12 +19,7 @@
 
 #include "DetectorConstruction.hh"
 #include "PhysicsList.hh"
-#include "PrimaryGeneratorAction.hh"
-#include "PrimaryGeneratorAction_Messenger.hh"
-#include "EventAction.hh"
-#include "EventAction_Messenger.hh"
-#include "TrackingAction.hh"
-#include "RunAction.hh"
+#include "ActionInitialization.hh"
 
 #ifdef G4VIS_USE
 #include "VisManager.hh"
@@ -24,92 +27,76 @@
 
 #include "Git_Hash.hh"
 
-#include "G4Timer.hh"
-G4Timer Timer;
-G4Timer Timerintern;
-
-int main(int argc,char** argv) 
+int main(int argc, char** argv)
 {
-  // Construct the default run manager
+  // Create the run manager: multi-threaded when G4MULTITHREADED is defined
+  // (i.e. Geant4 was built with MT support), single-threaded otherwise.
+#ifdef G4MULTITHREADED
+  G4MTRunManager* runManager = new G4MTRunManager;
+  // Use all available hardware cores.
+  runManager->SetNumberOfThreads(G4Threading::G4GetNumberOfCores());
+  G4cout << "Multithreaded mode: " << G4Threading::G4GetNumberOfCores()
+         << " threads" << G4endl;
+#else
   G4RunManager* runManager = new G4RunManager;
+#endif
 
   G4cout << "Executable: " << argv[0] << G4endl;
-  G4cout << "Git commit: " << GIT_HASH << G4endl;
+  G4cout << "Git commit: " << GIT_HASH  << G4endl;
   G4cout << "Git branch: " << GIT_BRANCH << G4endl;
-  
-  // set mandatory initialization classes
-  DetectorConstruction* detector=new DetectorConstruction();
-  PhysicsList *physicsList = new PhysicsList(detector);
+
+  // Mandatory initialisation: geometry and physics.
+  DetectorConstruction* detector = new DetectorConstruction();
+  PhysicsList* physicsList = new PhysicsList(detector);
   runManager->SetUserInitialization(detector);
   runManager->SetUserInitialization(physicsList);
 
-  // set mandatory user action class
-  EventAction* eventAction = new EventAction();
-  new EventAction_Messenger(eventAction);
-  runManager->SetUserAction(eventAction);
-  PrimaryGeneratorAction* generatorAction= new PrimaryGeneratorAction(detector);
-  new PrimaryGeneratorAction_Messenger(generatorAction);
-  runManager->SetUserAction(generatorAction);
-  RunAction* runAction = new RunAction(detector,eventAction);
-  runManager->SetUserAction(runAction);
+  // ActionInitialization replaces the old manual SetUserAction() calls.
+  // It creates per-thread copies of EventAction, PrimaryGeneratorAction,
+  // RunAction, and TrackingAction as required by G4MTRunManager.
+  // In serial builds G4RunManager calls Build() once on the main thread.
+  runManager->SetUserInitialization(new ActionInitialization(detector));
 
-  TrackingAction* trackingAction = new TrackingAction(eventAction);
-  runManager->SetUserAction(trackingAction);
-
-  G4UIsession* session=0;
+  G4UIsession* session = nullptr;
 
 #ifdef G4VIS_USE
-  // visualization manager
-  G4VisManager* visManager=0;
+  G4VisManager* visManager = nullptr;
 #endif
 
-  if (argc==1)   // Define UI session for interactive mode.
+  if (argc == 1)  // interactive mode
     {
-
 #ifdef G4VIS_USE
-      // visualization manager
-      visManager = new VisManager; 
+      visManager = new VisManager;
       visManager->Initialize();
 #endif
 
-// G4UIterminal is a (dumb) terminal.
 #ifdef G4UI_USE_TCSH
-      session = new G4UIterminal(new G4UItcsh);      
+      session = new G4UIterminal(new G4UItcsh);
 #else
       session = new G4UIterminal();
 #endif
-
     }
 
-  // Initialize G4 kernel
-  //  runManager->Initialize();
-  // Actually, we don't, so that we can set parameters before
-  // the detector is constructed.
-
-  
-  // get the pointer to the UI manager and set verbosities
   G4UImanager* UI = G4UImanager::GetUIpointer();
 
-  if (session)   // Define UI session for interactive mode.
+  if (session)  // interactive
     {
       session->SessionStart();
       delete session;
     }
-  else           // Batch mode
-    { 
-      G4String command = "/control/execute ";
+  else           // batch
+    {
+      G4String command  = "/control/execute ";
       G4String fileName = argv[1];
-      UI->ApplyCommand(command+fileName);
+      UI->ApplyCommand(command + fileName);
     }
 
-  // job termination
-  if(argc==1){
+  if (argc == 1) {
 #ifdef G4VIS_USE
-  delete visManager;
+    delete visManager;
 #endif
   }
 
   delete runManager;
-
   return 0;
 }

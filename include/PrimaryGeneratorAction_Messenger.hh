@@ -28,7 +28,6 @@ private:
   G4UIcmdWithADoubleAndUnit*   SrcXCmd;
   G4UIcmdWithADoubleAndUnit*   SrcYCmd;
   G4UIcmdWithADoubleAndUnit*   SrcZCmd;
-  G4UIcmdWithoutParameter*     SrcCCmd;
 
 };
 

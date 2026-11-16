@@ -260,19 +260,10 @@ def append_functional_log(rows):
             f.write("\t".join(str(v) for v in row) + "\n")
 
 
-def count_detected_and_simulated(filepath):
-    """Count detected and simulated events in a UCCeBrA output file.
+def _count_one_file(filepath):
+    """Count D and E lines in a single output file.
 
-    Each line beginning with 'E' corresponds to one simulated event.
-    Each line beginning with 'D' corresponds to one detected event
-    (an event in which at least one detector registered energy).
-
-    Args:
-        filepath: Absolute path to the simulation output file.
-
-    Returns:
-        Tuple of (n_detected, n_simulated) as integers.
-        Returns (0, 0) if the file cannot be read.
+    Returns (n_detected, n_simulated). Returns (0, 0) if file cannot be read.
     """
     n_detected = 0
     n_simulated = 0
@@ -284,8 +275,51 @@ def count_detected_and_simulated(filepath):
                 elif line.startswith("E"):
                     n_simulated += 1
     except OSError:
-        return 0, 0
+        pass
     return n_detected, n_simulated
+
+
+def count_detected_and_simulated(filepath):
+    """Count detected and simulated events in a UCCeBrA output file.
+
+    Each line beginning with 'E' corresponds to one simulated event.
+    Each line beginning with 'D' corresponds to one detected event
+    (an event in which at least one detector registered energy).
+
+    In multithreaded (MT) builds the simulation writes per-thread output files
+    named <base>_t0.<ext>, <base>_t1.<ext>, etc. This function automatically
+    detects MT output and aggregates counts across all thread files.
+
+    Args:
+        filepath: Absolute path to the primary (base) simulation output file.
+
+    Returns:
+        Tuple of (n_detected, n_simulated) as integers.
+        Returns (0, 0) if no readable output files are found.
+    """
+    # Determine the per-thread file pattern: insert "_t<N>" before last ".".
+    base, ext = os.path.splitext(filepath)
+    workdir = os.path.dirname(filepath)
+
+    # Collect all matching per-thread files, e.g. output_t0.out, output_t1.out.
+    thread_files = []
+    for fname in os.listdir(workdir):
+        full = os.path.join(workdir, fname)
+        # Match files named <base>_t<digits><ext>.
+        if re.match(re.escape(os.path.basename(base)) + r"_t\d+" + re.escape(ext) + r"$", fname):
+            thread_files.append(full)
+
+    if thread_files:
+        # MT mode: aggregate across all thread files.
+        total_d, total_e = 0, 0
+        for tf in sorted(thread_files):
+            d, e = _count_one_file(tf)
+            total_d += d
+            total_e += e
+        return total_d, total_e
+
+    # Serial mode: single output file.
+    return _count_one_file(filepath)
 
 
 def compute_ratio(n_detected, n_simulated):
@@ -343,7 +377,7 @@ SMOKE_CASES = [
         "UCCeBrA",
         "func_smoke_co60.mac",
         "examples/co60/co60.mac",
-        ["CeBrA_2026.geo", "mounts.geo", "bricks.geo"],  # geometry files for the demonstrator array
+        ["CeBrA_2026.geo", "bricks.geo", "mounts.geo"],  # geometry files for the demonstrator array
     ),
 ]
 
@@ -424,7 +458,7 @@ FUNCTIONAL_CASES = {
             "UCCeBrA",
             "func_sources_co60.mac",
             "examples/co60/co60.mac",
-            ["CeBrA_2026.geo", "mounts.geo", "bricks.geo"],  # demonstrator array geometry
+            ["CeBrA_2026.geo", "bricks.geo", "mounts.geo"],  # demonstrator array geometry
             "output.out",
         ),
     ],
@@ -564,7 +598,7 @@ BENCHMARK_CASES = [
         "UCCeBrA",
         "bench_co60.mac",
         "examples/co60/co60.mac",
-        ["CeBrA_2026.geo", "mounts.geo", "bricks.geo"],
+        ["CeBrA_2026.geo", "bricks.geo", "mounts.geo"],
     ),
 ]
 

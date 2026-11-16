@@ -7,9 +7,11 @@ all:  cs137.root  cs137_simple.root
 	then echo "Removing existing file $*.out"; rm $*.out; \
 	fi
 	UCCeBrA $*.mac 2>&1 | tee $*.log
+ifeq ($(G4MULTITHREADED), 1)
+	./concat_out.sh $* 2>&1   | tee -a $*.log
+endif
 
 # Pattern rule for sorting the simulation output into Root histograms
-# and Radware ascii spectra
 %.root : %.out
 	./cs137_sim_sort.py $*.out 2>&1 | tee -a $*.log
 

@@ -31,9 +31,6 @@ PrimaryGeneratorAction_Messenger::PrimaryGeneratorAction_Messenger(PrimaryGenera
   SrcZCmd->SetParameterName("Source Z position",false);
   SrcZCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 
-  SrcCCmd = new G4UIcmdWithoutParameter("/Source/Capsule/Construct",this);
-  SrcCCmd->SetGuidance("Construct source capsule");
-  
 }
 
 PrimaryGeneratorAction_Messenger::~PrimaryGeneratorAction_Messenger()
@@ -44,7 +41,6 @@ PrimaryGeneratorAction_Messenger::~PrimaryGeneratorAction_Messenger()
   delete SrcXCmd;
   delete SrcYCmd;
   delete SrcZCmd;
-  delete SrcCCmd;
 }
 
 void PrimaryGeneratorAction_Messenger::SetNewValue(G4UIcommand* command,G4String newValue)
@@ -64,9 +60,6 @@ void PrimaryGeneratorAction_Messenger::SetNewValue(G4UIcommand* command,G4String
 
   if( command == SrcZCmd )
     {PGA ->SetSourceZ(SrcZCmd->GetNewDoubleValue(newValue));}
-
-  if( command == SrcCCmd )
-    {PGA ->getDetectorConstruction()->getSourceCapsule()->Construct();}
 
 }
 

@@ -50,11 +50,16 @@ def Sort(fileName, nDet=1):
         return
     
     # Sort the output file.
+    nEvents = 0
     FEPCounts = 0
     lastEvent  = -1
     lastDet    = -1
     lastEnergy = 0
     while 1:
+        # Progress message
+        if nEvents%10000 == 0:
+            print(f'{nEvents} events processed.    \r',end='')
+            sys.stdout.flush()
         line = inFile.readline()
         if line == "":
             break
@@ -80,7 +85,8 @@ def Sort(fileName, nDet=1):
                 eRes = eSim + np.random.normal(scale=sigma)
 
                 histosRaw[det].Fill(eSim)
-                histos[det].Fill(eRes)        
+                histos[det].Fill(eRes)
+                histoAll.Fill(eRes)     
 
         if words[0] == 'E':
             NEmittedGammas = int(words[1])
@@ -103,6 +109,8 @@ for i in range(nDet):
     h    = root.TH1F(f"en{i}", f"Detector {i} energy",
                      nBins, 0, eMax)
     histos.append(h)
+histoAll = root.TH1D('enAll', 'Array Energy',
+                     nBins, 0, eMax)
 
 Sort(sys.argv[1], nDet)
 
@@ -114,5 +122,6 @@ outFile = root.TFile(outFileName, "RECREATE")
 for i in range(nDet):
     histosRaw[i].Write()
     histos[i].Write()
+histoAll.Write()
 
 outFile.Close()

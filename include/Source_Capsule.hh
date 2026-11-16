@@ -45,8 +45,6 @@ public:
   G4double getDepth(){return Depth;};
   G4double getRadius(){return Radius;};
   
-  void PlaceCapsule();
-
   private:
 
   G4String capsuleType;
@@ -67,12 +65,12 @@ public:
   // dimensions
   G4double Depth;
   G4double Radius;
-  G4double Length;
-  G4double Width;
   G4double innerRadius;
   G4double Thickness;
   G4double startAngle;
   G4double spanningAngle;
+  G4double Length;
+  G4double Width;
 
   // position
   G4RotationMatrix Rot;

@@ -20,6 +20,20 @@ The executable is automatically installed in
 
 (which is added to your path when you source `geant4make.sh`)
 
+## Multithreading ##
+
+If the Geant4 toolkit is compiled with multithreading support enabled, the `$G4MULTITHREADED` environment variable is set, and the number of events specified by `/run/beamOn` macro-file command will be divided among a number of threads determined by `G4Threading::G4GetNumberOfCores()`. Events are allocated to threads in batches to allow for competition between real and virtual cores.
+
+The `G4RunManager` class provides optional macro file commands both to control the number of threads
+
+    /run/numberOfThreads <number of threads>
+	
+and to specify the number of events to allocated in each batch
+	
+    /run/eventModulo <event batch size per thread>
+	
+> This command sets the batch size. Setting the batch size to the total number of events divided by the number of threads ensures that events are distributed evenly among the threads. This is necessary for cache-file mode. Generally, it is better to omit this and let the threads compete.
+
 ## Examples
 Run an example by typing `make` at the command line in the corresponding directory. Python 3.x is requred to run the sorting codes, and the [root data analysis framework](https://root.cern/) is needed to work with the sorted histograms.
 

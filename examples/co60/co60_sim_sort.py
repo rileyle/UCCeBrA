@@ -86,7 +86,8 @@ def Sort(fileName, nDet=1):
 
                 histosRaw[det].Fill(eSim)
                 histos[det].Fill(eRes)
-
+                histoAll.Fill(eRes)
+                
                 # Symmetrized gamma-gamma matrix
                 if event == lastEvent and det != lastDet:
                     gam_gam.Fill(eRes, lastEnergy)

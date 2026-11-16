@@ -172,9 +172,6 @@ public:
   G4double Window_Radius;
   G4double Window_Length;
 
- 
-
-
   G4Material* Al;
   G4Material* Steel = G4NistManager::Instance()->FindOrBuildMaterial("G4_STAINLESS-STEEL");
   G4Material* quartz;

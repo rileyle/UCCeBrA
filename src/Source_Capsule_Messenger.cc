@@ -42,6 +42,9 @@ Source_Capsule_Messenger::Source_Capsule_Messenger(Source_Capsule* sc)
   rZCmd->SetParameterName("choice",false);
   rZCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 
+  CCmd = new G4UIcmdWithoutParameter("/Source/Capsule/Construct",this);
+  CCmd->SetGuidance("Construct source capsule");
+  
 }
 
 Source_Capsule_Messenger::~Source_Capsule_Messenger()
@@ -51,6 +54,7 @@ Source_Capsule_Messenger::~Source_Capsule_Messenger()
   delete rXCmd;
   delete rYCmd;
   delete rZCmd;
+  delete CCmd;
 }
 
 
@@ -67,5 +71,7 @@ void Source_Capsule_Messenger::SetNewValue(G4UIcommand* command,G4String newValu
     {capsule->rotateY(rYCmd->GetNewDoubleValue(newValue));}
   if( command == rZCmd )
     {capsule->rotateZ(rZCmd->GetNewDoubleValue(newValue));}
+  if( command == CCmd )
+    {capsule->Construct();}
 }
 
