@@ -39,8 +39,6 @@
 #define PhysicsList_h 1
 
 #include "G4VModularPhysicsList.hh"
-#include "G4ProcessManager.hh"
-#include "G4NuclearLevelData.hh"
 #include "globals.hh"
 
 class DetectorConstruction;
@@ -69,8 +67,6 @@ public:
     virtual void ConstructHad();
 #endif
 
-  //  void AddReaction(); // Maybe include this later
-
   void EmPhysicsList(const G4String& name);
     
   void AddDecay();
@@ -86,8 +82,6 @@ public:
 private:    
   G4VPhysicsConstructor* fEmPhysicsList;
   G4String               fEmName;
-  G4VPhysicsConstructor*               fDecPhysicsList;
-  std::vector<G4VPhysicsConstructor*>  fHadronPhys; 
     
   DetectorConstruction* fDet;
 

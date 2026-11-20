@@ -22,7 +22,7 @@
 #include "ActionInitialization.hh"
 
 #ifdef G4VIS_USE
-#include "VisManager.hh"
+#include "G4VisExecutive.hh"
 #endif
 
 #include "Git_Hash.hh"
@@ -66,7 +66,7 @@ int main(int argc, char** argv)
   if (argc == 1)  // interactive mode
     {
 #ifdef G4VIS_USE
-      visManager = new VisManager;
+      visManager = new G4VisExecutive;
       visManager->Initialize();
 #endif
 

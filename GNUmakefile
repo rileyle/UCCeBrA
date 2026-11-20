@@ -5,6 +5,8 @@
 
 name := UCCeBrA
 
+CPPFLAGS += -DG4V11
+
 G4TARGET := $(name)
 G4EXLIB := true
 

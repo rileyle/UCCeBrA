@@ -50,7 +50,7 @@ G4bool TrackerGammaSD::ProcessHits(G4Step* aStep,G4TouchableHistory*)
   G4int detID
     = aStep->GetPostStepPoint()->GetTouchable()->GetReplicaNumber(0)-1000;
 
-  if(name.contains("crystal"))
+  if(G4StrUtil::contains(name, "crystal"))
     {
 
       TrackerGammaHit* newHit = new TrackerGammaHit();

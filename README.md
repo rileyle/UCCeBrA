@@ -2,12 +2,12 @@
 
 ## Compile and install
 
-Install version [10.7.4 of the Geant4 libraries](https://geant4.web.cern.ch/download/10.7.4.html). You will need the data files for low energy electromagnetic processes, photon evaporation, and radioactive decay.
+Install version [11.4.3 of the Geant4 libraries](https://geant4.web.cern.ch/download/11.4.3.html). You will need the data files for low energy electromagnetic processes, photon evaporation, and radioactive decay.
 
 Set up your environment (consider adding this to your `.bashrc`):
 
     $ source <Path to Geant4>/bin/geant4.sh
-    $ source <Path to Geant4>/share/Geant4-10.7.4/geant4make/geant4make.sh
+    $ source <Path to Geant4>/share/Geant4/geant4make/geant4make.sh
 
 Compile:
 

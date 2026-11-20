@@ -58,7 +58,7 @@ void CeBrA_Array::Construct()
       assemblyRot.rotateX(ax*deg);
       assemblyRot.rotateY(ay*deg);
       assemblyRot.rotateZ(az*deg);
-      if(type.contains("2x2")){
+      if(G4StrUtil::contains(type, "2x2")){
 	if(detector_2x2 == NULL){
 	  detector_2x2 = new CeBr3_2x2_Detector(expHall_log, materials);
 	  detector_2x2->Construct();
@@ -67,7 +67,7 @@ void CeBrA_Array::Construct()
 						 assemblyPos, &assemblyRot,
 						 detID);
 	detID++;
-      } else if(type.contains("3x3")){
+      } else if(G4StrUtil::contains(type, "3x3")){
 	if(detector_3x3 == NULL){
 	  detector_3x3 = new CeBr3_3x3_Detector(expHall_log, materials);
 	  detector_3x3->Construct();
@@ -76,7 +76,7 @@ void CeBrA_Array::Construct()
 						 assemblyPos, &assemblyRot,
 						 detID);
 	detID++;
-      } else if(type.contains("3x4")){
+      } else if(G4StrUtil::contains(type, "3x4")){
 	if(detector_3x4 == NULL){
 	  detector_3x4 = new CeBr3_3x4_Detector(expHall_log, materials);
 	  detector_3x4->Construct();
@@ -85,7 +85,7 @@ void CeBrA_Array::Construct()
 						 assemblyPos, &assemblyRot,
 						 detID);
 	detID++;
-      } else if(type.contains("3x6")){
+      } else if(G4StrUtil::contains(type, "3x6")){
 	if(detector_3x6 == NULL){
 	  detector_3x6 = new CeBr3_3x6_Detector(expHall_log, materials);
 	  detector_3x6->Construct();
@@ -100,8 +100,8 @@ void CeBrA_Array::Construct()
 	exit (EXIT_FAILURE);
       }
       // Option to include "Cradle" or "cradle" in the type string
-      if(type.contains("Cradle") || type.contains("cradle")){
-	if(type.contains("3x6")){
+      if(G4StrUtil::contains(type, "Cradle") || G4StrUtil::contains(type, "cradle")){
+	if(G4StrUtil::contains(type, "3x6")){
 	  Cradle* newCradle;
 	  if(abs(cradle->getOffset() - 104*mm) < 0.01*mm){
 	    newCradle = new Cradle(expHall_log, materials);
@@ -122,25 +122,25 @@ void CeBrA_Array::Construct()
       }
     }
   } else {
-    if(detectorType.contains("2x2")){
+    if(G4StrUtil::contains(detectorType, "2x2")){
       detector_2x2 = new CeBr3_2x2_Detector(expHall_log, materials);
       detector_2x2->Construct();
       detector_2x2->GetAssembly()->MakeImprint(expHall_log,
 					       assemblyPos, &assemblyRot,
 					       detID);
-    } else if(detectorType.contains("3x3")){
+    } else if(G4StrUtil::contains(detectorType, "3x3")){
       detector_3x3 = new CeBr3_3x3_Detector(expHall_log, materials);
       detector_3x3->Construct();
       detector_3x3->GetAssembly()->MakeImprint(expHall_log,
 					       assemblyPos, &assemblyRot,
 					       detID);
-    } else if(detectorType.contains("3x4")){
+    } else if(G4StrUtil::contains(detectorType, "3x4")){
       detector_3x4 = new CeBr3_3x4_Detector(expHall_log, materials);
       detector_3x4->Construct();
       detector_3x4->GetAssembly()->MakeImprint(expHall_log,
 					       assemblyPos, &assemblyRot,
 					       detID);
-    } else if(detectorType.contains("3x6")){
+    } else if(G4StrUtil::contains(detectorType, "3x6")){
       detector_3x6 = new CeBr3_3x6_Detector(expHall_log, materials);
       detector_3x6->Construct();
       detector_3x6->GetAssembly()->MakeImprint(expHall_log,
@@ -151,9 +151,9 @@ void CeBrA_Array::Construct()
 	      << G4endl;
 	exit (EXIT_FAILURE);
     }
-    if(detectorType.contains("Cradle") || detectorType.contains("cradle")){
+    if(G4StrUtil::contains(detectorType, "Cradle") || G4StrUtil::contains(detectorType, "cradle")){
       Cradle* newCradle = new Cradle(expHall_log, materials);;
-      if(detectorType.contains("3x6"))
+      if(G4StrUtil::contains(detectorType, "3x6"))
 	newCradle->setOffset(152*mm);
       newCradle->Construct();
       newCradle->GetAssembly()->MakeImprint(expHall_log,

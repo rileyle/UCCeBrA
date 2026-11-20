@@ -227,9 +227,9 @@ void Detector_Mount::PlaceMount()
       Rot.rotateX(ax*deg);
       Rot.rotateY(ay*deg);
       Rot.rotateZ(az*deg);
-      if (type.contains("BP") || type.contains("bp")){
+      if (G4StrUtil::contains(type, "BP") || G4StrUtil::contains(type, "bp")){
         BPassembly->MakeImprint(expHall_log, Pos, &Rot, MountID);
-      }else if (type.contains("3x3x")){
+      }else if (G4StrUtil::contains(type, "3x3x")){
         Lassembly->MakeImprint(expHall_log, Pos, &Rot, MountID);
       }
       MountID++;
